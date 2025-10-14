@@ -1,0 +1,19 @@
+[90m= [39m[34;4mApp\Models\User[39;24m {#7044
+    [34mid[39m: [35m2[39m,
+    [34mname[39m: "[32mZiad Hossam[39m",
+    [34memail[39m: "[32mziadhh2003@gmail.com[39m",
+    #[33mpassword[39m: "[32m$2y$12$Ku.x8Eiss/vCHpnz1ouxR.zNCxUBjPDBFAldTG6zuZ9vUhPSsLk7q[39m",
+    [34mavatar[39m: [36mnull[39m,
+    [34mprovider_id[39m: [36mnull[39m,
+    [34mtwilio_phone_number[39m: [36mnull[39m,
+    [34mtwilio_phone_sid[39m: [36mnull[39m,
+    [34mprovider[39m: [36mnull[39m,
+    [34mindustry[39m: [36mnull[39m,
+    [34musage[39m: [36mnull[39m,
+    [34mrole[39m: [35m0[39m,
+    [34mtenant_id[39m: "[32mkicfzf0zng[39m",
+    #[33mremember_token[39m: [36mnull[39m,
+    [34mcreated_at[39m: "[32m2025-09-27 01:13:16[39m",
+    [34mupdated_at[39m: "[32m2025-09-27 01:13:16[39m",
+  }
+

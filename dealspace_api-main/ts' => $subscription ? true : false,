@@ -1,0 +1,30 @@
+[90m= [39m[34;4mLaravel\Cashier\Subscription[39;24m {#7033
+    [34mid[39m: [35m1[39m,
+    [34muser_id[39m: [35m4[39m,
+    [34mtype[39m: "[32mdefault[39m",
+    [34mstripe_id[39m: "[32msub_1SGH97Q0iVC5TRNKnyYMQdW3[39m",
+    [34mstripe_status[39m: "[32mactive[39m",
+    [34mstripe_price[39m: "[32mprice_1SGHMJQ0iVC5TRNKpAYFh4ro[39m",
+    [34mquantity[39m: [35m1[39m,
+    [34mtrial_ends_at[39m: [36mnull[39m,
+    [34mends_at[39m: [36mnull[39m,
+    [34mcreated_at[39m: "[32m2025-10-09 10:32:31[39m",
+    [34mupdated_at[39m: "[32m2025-10-10 11:10:02[39m",
+    [34mitems[39m: [34;4mIlluminate\Database\Eloquent\Collection[39;24m {#7027
+      [34mall[39m: [
+        [34;4mLaravel\Cashier\SubscriptionItem[39;24m {#7024
+          [34mid[39m: [35m11[39m,
+          [34msubscription_id[39m: [35m1[39m,
+          [34mstripe_id[39m: "[32msi_TD4JuV7BtBaTRe[39m",
+          [34mstripe_product[39m: "[32mprod_TCgjrgz7op7onl[39m",
+          [34mstripe_price[39m: "[32mprice_1SGHMJQ0iVC5TRNKpAYFh4ro[39m",
+          [34mquantity[39m: [35m1[39m,
+          [34mcreated_at[39m: "[32m2025-10-10 11:08:03[39m",
+          [34mupdated_at[39m: "[32m2025-10-10 11:08:03[39m",
+          [34mmeter_id[39m: [36mnull[39m,
+          [34mmeter_event_name[39m: [36mnull[39m,
+        },
+      ],
+    },
+  }
+

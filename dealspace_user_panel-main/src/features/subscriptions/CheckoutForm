@@ -1,0 +1,170 @@
+import { useState, FormEvent } from 'react';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+  useCreateIntentMutation,
+  useSubscribeMutation,
+  useChangePlanMutation,
+} from './subscriptionApi';
+import { toast } from 'react-toastify';
+
+interface CheckoutFormProps {
+  selectedPlan: string;
+  isChangingPlan: boolean;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
+
+export function CheckoutForm({
+  selectedPlan,
+  isChangingPlan,
+  onSuccess,
+  onCancel,
+}: CheckoutFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const [createIntent] = useCreateIntentMutation();
+  const [subscribe] = useSubscribeMutation();
+  const [changePlan] = useChangePlanMutation();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // If changing plan, no payment method needed
+      if (isChangingPlan) {
+        await changePlan(selectedPlan).unwrap();
+        toast.success('Plan changed successfully!');
+        onSuccess();
+        return;
+      }
+
+      // Create setup intent
+      const intentResponse = await createIntent(selectedPlan).unwrap();
+
+      // Confirm card setup
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        throw new Error('Card element not found');
+      }
+
+      const { setupIntent, error } = await stripe.confirmCardSetup(
+        intentResponse.data.client_secret,
+        {
+          payment_method: {
+            card: cardElement,
+          },
+        }
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (setupIntent?.payment_method) {
+        // Create subscription
+        await subscribe({
+          plan: selectedPlan,
+          paymentMethodId: setupIntent.payment_method as string,
+        }).unwrap();
+
+        toast.success('Subscription created successfully!');
+        onSuccess();
+      }
+    } catch (error: any) {
+      console.error('Subscription error:', error);
+      toast.error(error?.data?.message || error.message || 'Subscription failed');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {!isChangingPlan && (
+        <div className="p-4 border border-gray-200 rounded-lg">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Card Information
+          </label>
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  fontFamily: 'system-ui, sans-serif',
+                  '::placeholder': {
+                    color: '#aab7c4',
+                  },
+                },
+                invalid: {
+                  color: '#9e2146',
+                },
+              },
+            }}
+          />
+        </div>
+      )}
+
+      {isChangingPlan && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            Your plan will be changed immediately. You will be charged the prorated amount.
+          </p>
+        </div>
+      )}
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isProcessing}
+          className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={!stripe || isProcessing}
+          className="flex-1 py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isProcessing ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Processing...
+            </span>
+          ) : isChangingPlan ? (
+            'Change Plan'
+          ) : (
+            'Subscribe'
+          )}
+        </button>
+      </div>
+    </form>
+  );
+}
