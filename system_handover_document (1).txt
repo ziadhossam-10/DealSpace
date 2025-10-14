@@ -1,0 +1,338 @@
+■ Project Handover Document
+1. Project Overview
+This project is a CRM-like system inspired by Follow Up Boss. It is designed to handle leads, deals,
+communication, scheduling, and team collaboration.
+
+Tech Stack:
+•
+•
+•
+
+Frontend: React, Redux, TailwindCSS
+Backend: Laravel, Laravel Octane (for high performance)
+Jobs & Queues: Redis
+
+2. Completed Modules
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+
+ActivityLog.php
+ApiKey.php
+AppointmentOutcome.php
+Appointment.php
+AppointmentType.php
+CalendarAccount.php
+CalendarEvent.php
+Call.php
+CampaignClick.php
+CampaignLink.php
+Campaign.php
+CampaignRecipient.php
+CustomField.php
+Deal.php
+DealStage.php
+DealType.php
+DealAttachment.php
+Domain.php
+EmailAccount.php
+Email.php
+EmailTemplate.php
+Event.php
+Group.php
+NoteMention.php
+Note.php
+Notification.php
+PersonEmail.php
+PersonFile.php
+PersonPhone.php
+Person.php
+PersonAddress.php
+PersonCustomFieldValue.php
+PersonTag.php
+Pond.php
+Reminder.php
+Stage.php
+Task.php
+Team.php
+Tenant.php
+
+•
+•
+•
+•
+
+TextMessage.php
+TextMessageTemplate.php
+TrackingScript.php
+User.php
+
+3. Pending Features (Next Steps)
+Lead Flow & Automation
+•
+•
+•
+•
+
+Lead sharing
+Lead filtering (global & scoped)
+Deals filtering
+User-based filtering on leads
+
+Collaboration & Access
+•
+•
+•
+
+Teams can have access to the same leads
+Groups can: Pull leads, Automatically assign leads
+Ponds can access and pull leads
+
+Scopes (Authorization & Visibility)
+•
+•
+•
+•
+•
+
+Individual Scope
+Group Scope (before pull)
+Pond Scope
+Team Scope
+On mentions (@mention), users should only see leads they have access to
+
+Policies (Authorization Layer)
+•
+•
+•
+•
+•
+•
+•
+•
+
+People (notes, calls, emails, text messages, tasks, appointments)
+Deals
+Reporting
+Calendar
+Groups
+Ponds
+Stages
+Global access
+
+Scopes of Filtering
+•
+•
+•
+•
+
+People
+Deals
+Groups
+Ponds
+
+Subscriptions & Payments
+•
+•
+•
+
+Implement subscription plans
+Integrate payments (Stripe, PayPal)
+Define subscription tiers
+
+4. Suggested Roadmap
+
+•
+•
+•
+•
+
+Policies & Scopes: Build policies and implement scopes for filtering and data access
+Lead Flow Automation: Implement sharing, filtering, and automatic assignment rules
+Permissions System: Team, group, and pond-level access with inheritance
+Payments & Subscriptions: Add subscription model and integrate with payment gateway
+
+5. Current State
+■ Almost all core modules are completed
+■ Missing: Lead flow, automation, permissions, payments
+
+sdfsafasfsafasfsafasfsafasfskkjjkkjkjjkkjjkjkjkkjkjkjkjjhjhhjjhjhjhjhnvbnvbgdfdgdfgfd
+
+
+
+
+
+
+
+
+Here is how we can use subscription checks in controlleres:
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Services\SubscriptionUsageService;
+use Illuminate\Http\Request;
+
+class DealsController extends Controller
+{
+    protected SubscriptionUsageService $usageService;
+
+    public function __construct(SubscriptionUsageService $usageService)
+    {
+        $this->usageService = $usageService;
+    }
+
+    /**
+     * Create a new deal (with subscription check)
+     */
+    public function store(Request $request)
+    {
+        // Check if user can create more deals
+        if (!$this->usageService->canUse($request->user(), 'deals')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have reached your deal limit for this billing period. Please upgrade your plan.',
+                'code' => 'USAGE_LIMIT_REACHED',
+            ], 403);
+        }
+
+        // Create the deal...
+        // $deal = Deal::create([...]);
+
+        // Increment usage
+        $this->usageService->incrementUsage($request->user(), 'deals');
+
+        return response()->json([
+            'success' => true,
+            'data' => $deal ?? [],
+        ]);
+    }
+}
+
+
+
+
+import { useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useCreateIntentMutation, useSubscribeMutation } from './subscriptionApi';
+import { toast } from 'react-toastify';
+
+// Load Stripe with your publishable key
+const stripePromise = loadStripe('pk_test_YOUR_PUBLISHABLE_KEY');
+
+function CheckoutForm({ selectedPlan }: { selectedPlan: string }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [createIntent] = useCreateIntentMutation();
+  const [subscribe, { isLoading }] = useSubscribeMutation();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    try {
+      // Step 1: Create setup intent (gets client_secret from backend)
+      const intentResponse = await createIntent(selectedPlan).unwrap();
+      
+      // Step 2: Confirm card setup with Stripe
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) return;
+
+      const { setupIntent, error } = await stripe.confirmCardSetup(
+        intentResponse.data.client_secret,
+        {
+          payment_method: {
+            card: cardElement,
+          },
+        }
+      );
+
+      if (error) {
+        toast.error(error.message || 'Payment failed');
+        return;
+      }
+
+      if (setupIntent?.payment_method) {
+        // Step 3: Send payment method ID to backend to create subscription
+        await subscribe({
+          plan: selectedPlan,
+          paymentMethodId: setupIntent.payment_method as string,
+        }).unwrap();
+
+        toast.success('Subscription created successfully!');
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Subscription failed');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <CardElement
+        options={{
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#424770',
+              '::placeholder': {
+                color: '#aab7c4',
+              },
+            },
+          },
+        }}
+      />
+      <button type="submit" disabled={!stripe || isLoading}>
+        {isLoading ? 'Processing...' : 'Subscribe'}
+      </button>
+    </form>
+  );
+}
+
+export function SubscriptionCheckout({ selectedPlan }: { selectedPlan: string }) {
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm selectedPlan={selectedPlan} />
+    </Elements>
+  );
+}
