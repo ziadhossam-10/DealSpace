@@ -12,11 +12,10 @@ use App\Enums\RoleEnum;
 use App\Enums\UsageEnum;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 use App\Scopes\UserScopes;
-use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, Billable;
+    use HasApiTokens, HasFactory, Notifiable;
     use BelongsToTenant;
     use UserScopes;
 

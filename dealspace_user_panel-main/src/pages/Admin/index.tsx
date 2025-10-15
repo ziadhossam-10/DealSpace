@@ -147,10 +147,10 @@ export default function AdminDashboardContent() {
       roles: [0, 1], // All roles
     },
     {
-      title: "Subscriptions & Billing",
-      to: "/admin/subscriptions/status",
+      title: "Subscriptions",
+      to: "/admin/subscriptions",
       icon: <CreditCard className="text-gray-600" size={20} />,
-      description: "Manage your subscription plans and billing information.",
+      description: "Manage your workspace subscription",
       roles: [0, 1], // Owner, Admin
     },
   ]

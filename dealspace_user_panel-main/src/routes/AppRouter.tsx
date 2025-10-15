@@ -47,11 +47,10 @@ import MarketingReport from "../features/reporting/marktingReport"
 import DealsReport from "../features/reporting/deals"
 import LeaderboardReport from "../features/reporting/leaderboard"
 import AppointmentsReportsPage from "../features/reporting/appointments"
-import { SubscriptionPlans } from "../features/subscriptions/index"
-import { SubscriptionSuccess } from "../features/subscriptions/SubscriptionSuccess"
-import { SubscriptionStatus } from "../features/subscriptions/SubscriptionStatus"
+import SubscriptionManagement from '../features/subscriptions/SubscriptionManagement'
+import SubscriptionUsage from "../features/subscriptions/SubscriptionUsage"
+import VerifySubscription from '../features/subscriptions/VerifySubscription'
 import { LeadFlowRulesPage } from "../features/leadFlowRules/index"
-import { InvoicesList } from "../features/subscriptions/InvoiceList"
 import { RoleEnum } from "../utils/roles"
 
 const AppRouter: React.FC = () => {
@@ -103,9 +102,9 @@ const AppRouter: React.FC = () => {
               <Route path="/admin/appointment-outcomes" element={<AppointmentOutcomes />} />
               
               {/* Subscriptions - Owner & Admin only */}
-              <Route path="/admin/subscriptions/plans" element={<SubscriptionPlans />} />
-              <Route path="/admin/subscriptions/success" element={<SubscriptionSuccess />} />
-              <Route path="/admin/subscriptions/status" element={<SubscriptionStatus />} />
+              <Route path="/admin/subscriptions" element={<SubscriptionManagement />} />
+              <Route path="/admin/subscriptions/usage" element={<SubscriptionUsage />} />
+              <Route path="/subscriptions/verify" element={<VerifySubscription />} />
             </Route>
 
             {/* Accessible to all roles */}

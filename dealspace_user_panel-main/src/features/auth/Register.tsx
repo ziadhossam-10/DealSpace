@@ -4,18 +4,20 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
+import { useNavigate } from "react-router-dom";
 import GridShape from "../../components/common/GridShape"
 import { Link } from "react-router"
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons"
 import PageMeta from "../../components/common/PageMeta"
-import { useRegisterMutation } from "./authApi"
+import { useRegisterMutation } from "./authApi";
 import { setCredentials } from "./authSlice"
 import { BASE_URL } from "../../utils/helpers"
 import { ApiResponse } from "../../types/meta"
 
 // Update the component to include new fields
 export default function Register() {
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [register, { isLoading }] = useRegisterMutation()
 
   const [showPassword, setShowPassword] = useState(false)
