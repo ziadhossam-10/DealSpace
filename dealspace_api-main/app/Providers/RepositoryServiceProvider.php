@@ -151,6 +151,8 @@ use App\Repositories\Subscriptions\SubscriptionUsageRepository;
 use App\Repositories\Subscriptions\SubscriptionUsageRepositoryInterface;
 use App\Services\Subscriptions\SubscriptionUsageServiceInterface;
 use App\Services\Subscriptions\SubscriptionUsageService;
+use App\Services\Tenants\TenantSubscriptionServiceInterface;
+use App\Services\Tenants\TenantSubscriptionService;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -264,7 +266,10 @@ class RepositoryServiceProvider extends ServiceProvider
 
         $this->app->bind(TrackingScriptServiceInterface::class, TrackingScriptService::class);
         $this->app->bind(TrackingServiceInterface::class, TrackingService::class);
+
         $this->app->bind(SubscriptionUsageRepositoryInterface::class, SubscriptionUsageRepository::class);
         $this->app->bind(SubscriptionUsageServiceInterface::class, SubscriptionUsageService::class);
+
+        $this->app->bind(TenantSubscriptionServiceInterface::class, TenantSubscriptionService::class);
     }
 }

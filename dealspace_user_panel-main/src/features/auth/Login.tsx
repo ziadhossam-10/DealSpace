@@ -1,9 +1,10 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
+import { useState } from "react"
 import GridShape from "../../components/common/GridShape"
 import { Link } from "react-router"
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons"
@@ -12,6 +13,7 @@ import { useLoginMutation } from "./authApi"
 import { setCredentials } from "./authSlice"
 
 export default function Login() {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const [login, { isLoading }] = useLoginMutation()
 

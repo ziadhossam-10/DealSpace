@@ -58,6 +58,7 @@ use App\Http\Controllers\Api\Reports\MarketingReportApiController;
 use App\Http\Controllers\Api\TrackingController;
 use App\Http\Controllers\Api\TrackingScriptController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\WebhookController;
 use App\Http\Controllers\Api\Admin\SubscriptionManagementController;
 use App\Http\Controllers\Api\LeadFlowRuleController;
 use App\Http\Controllers\Api\ActionPlanController;
@@ -524,43 +525,18 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
     | Subscription Routes
     |--------------------------------------------------------------------------
     */
-    Route::prefix('subscriptions')->name('subscriptions.')->group(function () {
+    Route::middleware(['auth:sanctum'])->prefix('subscriptions')->name('subscriptions.')->group(function () {
         Route::get('/plans', [SubscriptionController::class, 'plans'])->name('plans');
         Route::get('/status', [SubscriptionController::class, 'status'])->name('status');
-        Route::get('/usage', [SubscriptionController::class, 'usage'])->name('usage');
-        Route::get('/check-feature/{feature}', [SubscriptionController::class, 'checkFeature'])->name('check-feature');
-        
-        // Checkout & Portal
-        Route::post('/checkout', [SubscriptionController::class, 'createCheckoutSession'])->name('checkout');
-        Route::post('/portal', [SubscriptionController::class, 'createPortalSession'])->name('portal');
-        Route::post('/verify-session', [SubscriptionController::class, 'verifyCheckoutSession'])->name('verify-session');
-        
-        // Subscription management
+        Route::post('/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
+        Route::post('/verify', [SubscriptionController::class, 'verifyCheckoutSession'])->name('verify');
         Route::post('/cancel', [SubscriptionController::class, 'cancel'])->name('cancel');
         Route::post('/cancel-now', [SubscriptionController::class, 'cancelNow'])->name('cancel-now');
         Route::post('/resume', [SubscriptionController::class, 'resume'])->name('resume');
-        
-        // Invoices
+        Route::get('/portal', [SubscriptionController::class, 'portalSession'])->name('portal');
         Route::get('/invoices', [SubscriptionController::class, 'invoices'])->name('invoices');
-        Route::get('/invoices/{invoice}/download', [SubscriptionController::class, 'downloadInvoice'])->name('invoice.download');
-        
-        // Debug/Sync
-        Route::post('/sync-from-stripe', [SubscriptionController::class, 'syncFromStripe'])->name('sync');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Subscription Management Routes
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('admin/subscriptions')->middleware('admin')->name('admin.subscriptions.')->group(function () {
-        Route::get('/', [SubscriptionManagementController::class, 'index'])->name('index');
-        Route::get('/statistics', [SubscriptionManagementController::class, 'statistics'])->name('statistics');
-        Route::get('/{user}', [SubscriptionManagementController::class, 'show'])->name('show');
-        Route::post('/{user}/cancel', [SubscriptionManagementController::class, 'cancel'])->name('cancel');
-        Route::post('/{user}/cancel-now', [SubscriptionManagementController::class, 'cancelNow'])->name('cancel-now');
-        Route::post('/{user}/resume', [SubscriptionManagementController::class, 'resume'])->name('resume');
-        Route::post('/{user}/change-plan', [SubscriptionManagementController::class, 'changePlan'])->name('change-plan');
+        Route::get('/invoices/{invoiceId}/download', [SubscriptionController::class, 'downloadInvoice'])->name('invoices.download');
+        Route::get('/usage', [SubscriptionController::class, 'usage'])->name('usage');
     });
 
     // Lead Flow Rule Routes
@@ -594,3 +570,6 @@ Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+// Stripe webhook (no auth required)
+Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('cashier.webhook');
