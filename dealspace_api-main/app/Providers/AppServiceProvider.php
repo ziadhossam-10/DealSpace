@@ -25,6 +25,8 @@ use App\Policies\DealTypePolicy;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Cashier\Cashier;
+use App\Models\Tenant;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -53,5 +55,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Reminder::class, ReminderPolicy::class);
         Gate::policy(\App\Models\Team::class, TeamPolicy::class);
         URL::forceScheme('https');
+
+        // Ensure Cashier treats Tenant as the billable (customer) model so
+        // Subscription->owner() resolves using 'tenant_id' in subscriptions table.
+        Cashier::useCustomerModel(Tenant::class);
     }
 }

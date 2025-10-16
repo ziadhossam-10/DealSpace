@@ -241,7 +241,8 @@ export default function CreatePerson() {
       // Show success message and navigate back to people list
       toast.success("Person created successfully!")
       navigate("/people")
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to create person. Please check the form for errors.")
       console.error("Failed to create person:", error)
     }
   }
