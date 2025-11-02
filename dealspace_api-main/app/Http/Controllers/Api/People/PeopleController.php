@@ -25,7 +25,6 @@ class PeopleController extends Controller
     use AuthorizesRequests;
     
     protected $personService;
-    protected $usageService;
     protected $leadFlowService; 
 
     public function __construct(

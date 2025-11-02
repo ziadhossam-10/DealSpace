@@ -13,19 +13,16 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Deal;
 use Illuminate\Support\Facades\Gate;
-use App\Services\Subscriptions\SubscriptionUsageServiceInterface;
 use App\Services\Tenants\TenantSubscriptionServiceInterface;
 
 class DealsController extends Controller
 {
     protected $dealService;
-    protected $usageService;
     protected $tenantService;
 
-    public function __construct(DealServiceInterface $dealService, SubscriptionUsageServiceInterface $usageService, TenantSubscriptionServiceInterface $tenantService)
+    public function __construct(DealServiceInterface $dealService, TenantSubscriptionServiceInterface $tenantService)
     {
         $this->dealService = $dealService;
-        $this->usageService = $usageService;
         $this->tenantService = $tenantService;
     }
 

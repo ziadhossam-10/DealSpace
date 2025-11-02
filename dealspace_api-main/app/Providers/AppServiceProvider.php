@@ -10,6 +10,7 @@ use App\Models\Reminder;
 use App\Models\DealStage;
 use App\Models\DealType;
 use App\Models\Person;
+use App\Models\Team;
 
 use App\Policies\PersonPolicy;
 use App\Policies\DealPolicy;
@@ -53,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Stage::class, StagePolicy::class);
         Gate::policy(Task::class, TaskPolicy::class);
         Gate::policy(Reminder::class, ReminderPolicy::class);
-        Gate::policy(\App\Models\Team::class, TeamPolicy::class);
+        Gate::policy(Team::class, TeamPolicy::class);
         URL::forceScheme('https');
 
         // Ensure Cashier treats Tenant as the billable (customer) model so
